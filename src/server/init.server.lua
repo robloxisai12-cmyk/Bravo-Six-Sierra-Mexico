@@ -38,6 +38,38 @@ end
 
 getOrCreateRemote(Config.TerritoryUpdateRemoteName)
 getOrCreateRemote(Config.TeamUpdateRemoteName)
+local teamRequest = getOrCreateRemote(Config.TeamRequestRemoteName)
+
+local lastTeamRequest = {}
+teamRequest.OnServerEvent:Connect(function(player, requestedKey)
+    if typeof(requestedKey) ~= "string" then
+        return
+    end
+
+    local now = os.clock()
+    if lastTeamRequest[player] and now - lastTeamRequest[player] < 2 then
+        return
+    end
+    lastTeamRequest[player] = now
+
+    local teamConfig = Config.Teams[requestedKey]
+    if not teamConfig then
+        return
+    end
+
+    local team = Teams:FindFirstChild(teamConfig.Name)
+    if not team then
+        return
+    end
+
+    player.Team = team
+    player.Neutral = false
+    player:LoadCharacter()
+end)
+
+game:GetService("Players").PlayerRemoving:Connect(function(player)
+    lastTeamRequest[player] = nil
+end)
 
 TerritoryService.Start()
 print("[Bravo Six] Server systems initialized.")
