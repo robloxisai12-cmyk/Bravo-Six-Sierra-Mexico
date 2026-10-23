@@ -37,9 +37,9 @@ Proyecto Roblox de mundo abierto inspirado en una región ficticia de México. E
 default.project.json
 src/
   shared/Config.lua
-  server/init.server.lua
+  server/Bootstrap.server.lua
   server/Services/TerritoryService.lua
-  client/init.client.lua
+  client/HUD.client.lua
 .github/workflows/validate.yml
 Mapa Origen RP Roblox.rbxl
 ```
