@@ -43,8 +43,8 @@ end
 
 local originalBytes = fs.readFile(MAP_PATH)
 local sourceBytes = fs.readFile(BUILD_PATH)
-assert(#originalBytes > 0, "Original map file is empty.")
-assert(#sourceBytes > 0, "Rojo build file is empty.")
+assert(string.len(originalBytes) > 0, "Original map file is empty.")
+assert(string.len(sourceBytes) > 0, "Rojo build file is empty.")
 
 local original = roblox.deserializePlace(originalBytes)
 local built = roblox.deserializePlace(sourceBytes)
@@ -68,8 +68,8 @@ assert(child(services, "TerritoryService", "ServerScriptService.Server.Services"
 assert(child(services, "VehicleService", "ServerScriptService.Server.Services"), "Missing VehicleService")
 
 local mergedBytes = roblox.serializePlace(original)
-assert(mergedBytes ~= nil and #mergedBytes > 0, "Serialization produced an empty place.")
+assert(mergedBytes ~= nil and string.len(mergedBytes) > 0, "Serialization produced an empty place.")
 fs.writeFile(OUTPUT_PATH, mergedBytes)
 
 print("Merge complete. Original map was not modified.")
-print("Output: " .. OUTPUT_PATH .. " (" .. tostring(#mergedBytes) .. " bytes)")
+print("Output: " .. OUTPUT_PATH .. " (" .. tostring(string.len(mergedBytes)) .. " bytes)")
