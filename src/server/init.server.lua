@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
 
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
-local TerritoryService = require(script:WaitForChild("Services"):WaitForChild("TerritoryService"))
+local TerritoryService = require(script.Parent:WaitForChild("Services"):WaitForChild("TerritoryService"))
 
 local function getOrCreateTeam(config)
     local team = Teams:FindFirstChild(config.Name)
