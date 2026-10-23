@@ -6,7 +6,7 @@ Proyecto Roblox de mundo abierto inspirado en una región ficticia de México. E
 
 - [x] Archivo base: `Mapa Origen RP Roblox.rbxl`
 - [x] Estructura inicial de Rojo
-- [x] Equipos de juego creados en servidor
+- [x] Equipos de juego creados y selector de facción validado en servidor
 - [x] Captura inicial de territorios basada en zonas configuradas
 - [x] HUD cliente adaptable a pantalla pequeña
 - [x] Workflow de validación/build para Rojo
@@ -17,7 +17,7 @@ Proyecto Roblox de mundo abierto inspirado en una región ficticia de México. E
 ## Requisitos
 
 - Roblox Studio (Windows/macOS) para abrir y probar el place.
-- Rojo 7.x para sincronizar la carpeta de código.
+- Rojo 7.7.1 (fijado en `rokit.toml`) para sincronizar la carpeta de código.
 - Git para versionar cambios.
 
 > Roblox Studio no tiene una versión oficial para Android. Desde Android puedes administrar GitHub y el archivo, pero la prueba de Studio requiere un ordenador o un flujo remoto compatible.
@@ -25,7 +25,7 @@ Proyecto Roblox de mundo abierto inspirado en una región ficticia de México. E
 ## Cómo conectar el código al mapa existente
 
 1. Descarga `Mapa Origen RP Roblox.rbxl` desde este repositorio y ábrelo en Roblox Studio.
-2. En el ordenador, instala Rojo 7.x y ejecuta desde la raíz del repositorio: `rojo serve default.project.json`.
+2. En el ordenador, instala Rokit y ejecuta `rokit install` desde la raíz para instalar la versión fijada. Después ejecuta `rojo serve default.project.json`.
 3. Con el plugin Rojo conectado, sincroniza el proyecto con el place abierto.
 4. Guarda una copia nueva del place antes de probar cambios.
 5. En Workspace crea una carpeta llamada `Territories`. Para cada punto capturable, añade una pieza invisible anclada, sin colisión y con nombre descriptivo. Ajusta `Size` para definir el área y agrega el atributo numérico `CaptureTime` (opcional; por defecto 10 segundos). La pieza será la zona de control.
