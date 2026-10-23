@@ -59,6 +59,23 @@ for _, pair in {
 end
 
 out("")
+out("[Collision check for proposed merge children]")
+local function checkCollision(label, target, names)
+    out(label .. ":")
+    if not target then
+        out("  TARGET MISSING")
+        return
+    end
+    for _, name in names do
+        local found = target:FindFirstChild(name)
+        out(string.format("  %s: %s", name, found and ("COLLISION (" .. found.ClassName .. ")") or "free"))
+    end
+end
+checkCollision("ReplicatedStorage.Shared", replicatedStorage:FindFirstChild("Shared"), { "Config", "VehicleConfig" })
+checkCollision("ServerScriptService.Server", serverScriptService:FindFirstChild("Server"), { "Bootstrap", "Services" })
+checkCollision("StarterPlayer.StarterPlayerScripts", starterPlayerScripts, { "HUD", "DeployMenu", "VehicleHUD" })
+
+out("")
 out("[Scripts and relevant source lines]")
 local roots = { replicatedStorage, serverScriptService, starterPlayerScripts }
 local patterns = {
@@ -81,13 +98,23 @@ for _, root in roots do
             if not sourceOk or type(source) ~= "string" then
                 out("  SOURCE UNAVAILABLE to inspector")
             else
+                local lowerPath = string.lower(fullPath)
+                local dumpFullSource = string.find(lowerPath, "bootstrapperlogic", 1, true)
+                    or string.find(lowerPath, "playerService", 1, true)
+                    or string.find(lowerPath, "mapaccessservice", 1, true)
+                    or string.find(lowerPath, "telemetrybootstrap", 1, true)
                 local matched = 0
                 for lineNumber, line in string.split(source, "\n") do
-                    for _, pattern in patterns do
-                        if string.find(string.lower(line), string.lower(pattern), 1, true) then
-                            out(string.format("  L%d: %s", lineNumber, string.sub(line, 1, 240)))
-                            matched += 1
-                            break
+                    if dumpFullSource then
+                        out(string.format("  L%d: %s", lineNumber, string.sub(line, 1, 300)))
+                        matched += 1
+                    else
+                        for _, pattern in patterns do
+                            if string.find(string.lower(line), string.lower(pattern), 1, true) then
+                                out(string.format("  L%d: %s", lineNumber, string.sub(line, 1, 240)))
+                                matched += 1
+                                break
+                            end
                         end
                     end
                 end
