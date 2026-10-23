@@ -7,6 +7,14 @@ local MAP_PATH = "Mapa Origen RP Roblox.rbxl"
 local BUILD_PATH = "build/BravoSix-src.rbxl"
 local OUTPUT_PATH = "BravoSix-merged.rbxl"
 
+local function byteLength(value)
+    if typeof(value) == "buffer" then
+        return buffer.len(value)
+    end
+    assert(type(value) == "string", "Expected a string or buffer when measuring byte length.")
+    return #value
+end
+
 local function child(parent, name, context)
     assert(parent ~= nil, "Missing parent while locating " .. context)
     local result = parent:FindFirstChild(name)
@@ -43,8 +51,8 @@ end
 
 local originalBytes = fs.readFile(MAP_PATH)
 local sourceBytes = fs.readFile(BUILD_PATH)
-assert(string.len(originalBytes) > 0, "Original map file is empty.")
-assert(string.len(sourceBytes) > 0, "Rojo build file is empty.")
+assert(byteLength(originalBytes) > 0, "Original map file is empty.")
+assert(byteLength(sourceBytes) > 0, "Rojo build file is empty.")
 
 local original = roblox.deserializePlace(originalBytes)
 local built = roblox.deserializePlace(sourceBytes)
@@ -68,8 +76,12 @@ assert(child(services, "TerritoryService", "ServerScriptService.Server.Services"
 assert(child(services, "VehicleService", "ServerScriptService.Server.Services"), "Missing VehicleService")
 
 local mergedBytes = roblox.serializePlace(original)
-assert(mergedBytes ~= nil and string.len(mergedBytes) > 0, "Serialization produced an empty place.")
+assert(mergedBytes ~= nil and byteLength(mergedBytes) > 0, "Serialization produced an empty place.")
 fs.writeFile(OUTPUT_PATH, mergedBytes)
 
+assert(fs.isFile(OUTPUT_PATH), "Output file was not created: " .. OUTPUT_PATH)
+local writtenBytes = fs.readFile(OUTPUT_PATH)
+assert(byteLength(writtenBytes) > 0, "Output file is empty after writing: " .. OUTPUT_PATH)
+
 print("Merge complete. Original map was not modified.")
-print("Output: " .. OUTPUT_PATH .. " (" .. tostring(string.len(mergedBytes)) .. " bytes)")
+print("Output: " .. OUTPUT_PATH .. " (" .. tostring(byteLength(writtenBytes)) .. " bytes)")
