@@ -100,7 +100,7 @@ for _, root in roots do
             else
                 local lowerPath = string.lower(fullPath)
                 local dumpFullSource = string.find(lowerPath, "bootstrapperlogic", 1, true)
-                    or string.find(lowerPath, "playerService", 1, true)
+                    or string.find(lowerPath, "playerservice", 1, true)
                     or string.find(lowerPath, "mapaccessservice", 1, true)
                     or string.find(lowerPath, "telemetrybootstrap", 1, true)
                 local matched = 0
