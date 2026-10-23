@@ -1,6 +1,8 @@
 name: Inspect map structure (read-only)
 
 on:
+  push:
+    branches: [chore/inspeccionar-mapa-readonly]
   workflow_dispatch:
 
 permissions:
