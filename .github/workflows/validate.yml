@@ -28,10 +28,10 @@ jobs:
       - name: Build project tree
         run: |
           mkdir -p build
-          rojo build default.project.json --output build/BravoSix-src.rbxlx
+          rojo build default.project.json --output build/BravoSix-src.rbxl
 
       - name: Check generated source place
-        run: test -s build/BravoSix-src.rbxlx
+        run: test -s build/BravoSix-src.rbxl
 
       - name: Merge code into original map (no publishing)
         run: |
