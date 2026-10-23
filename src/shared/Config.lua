@@ -24,5 +24,6 @@ Config.Territories = {
 Config.RemotesFolderName = "BravoSixRemotes"
 Config.TerritoryUpdateRemoteName = "TerritoryUpdate"
 Config.TeamUpdateRemoteName = "TeamUpdate"
+Config.TeamRequestRemoteName = "TeamRequest"
 
 return Config
