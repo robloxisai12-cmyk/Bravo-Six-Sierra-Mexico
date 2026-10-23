@@ -1,5 +1,6 @@
 -- Vehicle definitions shared by the server and client.
 -- Team names must match Config.Teams in src/shared/Config.lua.
+local Config = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Config"))
 local VehicleConfig = {}
 
 VehicleConfig.RemotesFolderName = "BravoSixRemotes"
@@ -7,6 +8,7 @@ VehicleConfig.RequestRemoteName = "VehicleRequest"
 VehicleConfig.StateRemoteName = "VehicleState"
 
 VehicleConfig.MaxActiveVehicles = 6
+VehicleConfig.MaxActivePerPlayer = 1
 VehicleConfig.RequestCooldown = 3
 VehicleConfig.EmptyVehicleLifetime = 45
 VehicleConfig.DestroyedRespawnDelay = 20
@@ -16,8 +18,8 @@ VehicleConfig.FallbackSpawnDistance = 20
 VehicleConfig.VehicleNamePrefix = "BravoVehicle_"
 
 VehicleConfig.Teams = {
-    Government = "Fuerza Federal",
-    Sierra = "Fuerza Sierra",
+    Government = Config.Teams.Government.Name,
+    Cartels = Config.Teams.Cartels.Name,
 }
 
 VehicleConfig.Types = {
@@ -34,7 +36,7 @@ VehicleConfig.Types = {
     },
     CartelPickup = {
         DisplayName = "Camioneta Sierra",
-        TeamKey = "Sierra",
+        TeamKey = "Cartels",
         Kind = "Car",
         BodyColor = Color3.fromRGB(70, 65, 58),
         MaxSpeed = 78,
@@ -72,7 +74,8 @@ function VehicleConfig.CanUse(player, vehicleType)
     if not definition or not player or not player.Team then
         return false
     end
-    return player.Team.Name == VehicleConfig.Teams[definition.TeamKey]
+    local teamConfig = Config.Teams[definition.TeamKey]
+    return teamConfig ~= nil and player.Team.Name == teamConfig.Name
 end
 
 return VehicleConfig
