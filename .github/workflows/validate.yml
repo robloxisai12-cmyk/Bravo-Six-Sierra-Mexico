@@ -1,0 +1,26 @@
+name: Validate Rojo project
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rojo
+        uses: rojo-rbx/setup-rojo@v1
+        with:
+          version: "7.4.4"
+
+      - name: Build project tree
+        run: rojo build default.project.json --output /tmp/BravoSixSierraMexico.rbxlx
+
+      - name: Check generated place file
+        run: test -s /tmp/BravoSixSierraMexico.rbxlx
