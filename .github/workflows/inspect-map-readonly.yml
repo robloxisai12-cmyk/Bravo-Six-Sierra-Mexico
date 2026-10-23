@@ -1,0 +1,37 @@
+name: Inspect map structure (read-only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify inspection inputs
+        run: |
+          test -s "Mapa Origen RP Roblox.rbxl"
+          test -s "scripts/inspect_map.luau"
+
+      - name: Install fixed Lune version
+        run: |
+          cargo install lune --version 0.11.0 --locked
+          lune --version
+
+      - name: Inspect place without modifying it
+        run: |
+          lune run scripts/inspect_map.luau > map-inspection-report.txt
+          cat map-inspection-report.txt
+
+      - name: Upload inspection report
+        uses: actions/upload-artifact@v4
+        with:
+          name: map-inspection-report
+          path: map-inspection-report.txt
+          if-no-files-found: error
+          retention-days: 14
