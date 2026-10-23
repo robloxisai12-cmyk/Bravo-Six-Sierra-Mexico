@@ -31,7 +31,7 @@ local dataModel = dataModelOrError
 local replicatedStorage = dataModel:GetService("ReplicatedStorage")
 local serverScriptService = dataModel:GetService("ServerScriptService")
 local starterPlayer = dataModel:GetService("StarterPlayer")
-local starterPlayerScripts = starterPlayer:WaitForChild("StarterPlayerScripts")
+local starterPlayerScripts = assert(starterPlayer:FindFirstChild("StarterPlayerScripts"), "StarterPlayerScripts no existe en el mapa")
 
 local function listChildren(label, parent)
     out("")
