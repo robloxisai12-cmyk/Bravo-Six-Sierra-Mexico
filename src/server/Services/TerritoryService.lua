@@ -87,6 +87,27 @@ local function publish(zone, owner, progressTeam, progress)
 end
 
 function TerritoryService.Start()
+    Players.PlayerAdded:Connect(function(player)
+        task.delay(2, function()
+            if not player.Parent then
+                return
+            end
+            local remotes = ReplicatedStorage:FindFirstChild(Config.RemotesFolderName)
+            local remote = remotes and remotes:FindFirstChild(Config.TerritoryUpdateRemoteName)
+            if not remote then
+                return
+            end
+            for _, zone in ipairs(getTerritoryParts()) do
+                remote:FireClient(player, {
+                    territory = zone.Name,
+                    owner = zone:GetAttribute("OwnerTeam") or "",
+                    progressTeam = zone:GetAttribute("CaptureTeam") or "",
+                    progress = tonumber(zone:GetAttribute("CaptureProgress")) or 0,
+                })
+            end
+        end)
+    end)
+
     task.spawn(function()
         while true do
             for _, zone in ipairs(getTerritoryParts()) do
