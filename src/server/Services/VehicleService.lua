@@ -303,7 +303,11 @@ local function getSpawnCFrame(player, definition)
 
     local overlapParams = OverlapParams.new()
     overlapParams.FilterType = Enum.RaycastFilterType.Exclude
-    overlapParams.FilterDescendantsInstances = { character, chosen, hit.Instance }
+    local excluded = { character, hit.Instance }
+    if chosen then
+        table.insert(excluded, chosen)
+    end
+    overlapParams.FilterDescendantsInstances = excluded
     overlapParams.MaxParts = 30
     local bounds = Vector3.new(width + 1.5, chassisHeight + 3.5, length + 1.5)
     for _, part in ipairs(Workspace:GetPartBoundsInBox(finalCFrame, bounds, overlapParams)) do
