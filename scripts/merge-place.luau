@@ -4,7 +4,7 @@ local fs = require("@lune/fs")
 local roblox = require("@lune/roblox")
 
 local MAP_PATH = "Mapa Origen RP Roblox.rbxl"
-local BUILD_PATH = "build/BravoSix-src.rbxlx"
+local BUILD_PATH = "build/BravoSix-src.rbxl"
 local OUTPUT_PATH = "BravoSix-merged.rbxl"
 
 local function child(parent, name, context)
@@ -43,8 +43,8 @@ end
 
 local originalBytes = fs.readFile(MAP_PATH)
 local sourceBytes = fs.readFile(BUILD_PATH)
-assert(buffer.len(originalBytes) > 0, "Original map file is empty.")
-assert(buffer.len(sourceBytes) > 0, "Rojo build file is empty.")
+assert(#originalBytes > 0, "Original map file is empty.")
+assert(#sourceBytes > 0, "Rojo build file is empty.")
 
 local original = roblox.deserializePlace(originalBytes)
 local built = roblox.deserializePlace(sourceBytes)
@@ -68,7 +68,7 @@ assert(child(services, "TerritoryService", "ServerScriptService.Server.Services"
 assert(child(services, "VehicleService", "ServerScriptService.Server.Services"), "Missing VehicleService")
 
 local mergedBytes = roblox.serializePlace(original)
-assert(mergedBytes ~= nil and buffer.len(mergedBytes) > 0, "Serialization produced an empty place.")
+assert(mergedBytes ~= nil and #mergedBytes > 0, "Serialization produced an empty place.")
 fs.writeFile(OUTPUT_PATH, mergedBytes)
 
 print("Merge complete. Original map was not modified.")
