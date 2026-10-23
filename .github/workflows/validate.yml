@@ -17,14 +17,31 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - name: Install Rojo CLI
-        run: cargo install rojo --version 7.7.1 --locked
+      - name: Install pinned Rojo and Lune
+        run: |
+          cargo install rojo --version 7.7.1 --locked
+          cargo install lune --version 0.11.0 --locked
 
       - name: Validate project JSON
         run: python -m json.tool default.project.json > /dev/null
 
       - name: Build project tree
-        run: rojo build default.project.json --output /tmp/BravoSixSierraMexico.rbxlx
+        run: |
+          mkdir -p build
+          rojo build default.project.json --output build/BravoSix-src.rbxl
 
-      - name: Check generated place file
-        run: test -s /tmp/BravoSixSierraMexico.rbxlx
+      - name: Check generated source place
+        run: test -s build/BravoSix-src.rbxl
+
+      - name: Merge code into original map (no publishing)
+        run: |
+          lune run scripts/merge-place.luau
+          test -s BravoSix-merged.rbxl
+
+      - name: Upload merged map validation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BravoSix-merged-place-validation
+          path: BravoSix-merged.rbxl
+          if-no-files-found: error
+          retention-days: 14

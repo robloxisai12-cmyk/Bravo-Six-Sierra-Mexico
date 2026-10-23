@@ -6,6 +6,7 @@ local Workspace = game:GetService("Workspace")
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 
 local TerritoryService = {}
+local started = false
 local progressByPart = {}
 local lastSentState = {}
 
@@ -89,6 +90,13 @@ local function publish(zone, owner, progressTeam, progress)
 end
 
 function TerritoryService.Start()
+    -- The template auto-loader and Bravo Bootstrap can both call Start().
+    -- Keep this service idempotent so capture loops and event connections exist once.
+    if started then
+        return
+    end
+    started = true
+
     Players.PlayerAdded:Connect(function(player)
         task.delay(2, function()
             if not player.Parent then

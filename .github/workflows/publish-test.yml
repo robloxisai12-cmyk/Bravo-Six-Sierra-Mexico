@@ -1,0 +1,74 @@
+name: Build and publish Bravo Six test
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "Saved creates a saved version only; Published publishes the new place version."
+        required: true
+        type: choice
+        options:
+          - Saved
+          - Published
+        default: Saved
+
+permissions:
+  contents: read
+
+jobs:
+  build-merge-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Install pinned Rojo and Lune
+        run: |
+          cargo install rojo --version 7.7.1 --locked
+          cargo install lune --version 0.11.0 --locked
+
+      - name: Validate project JSON
+        run: python -m json.tool default.project.json > /dev/null
+
+      - name: Build Bravo Six scripts with Rojo
+        run: |
+          mkdir -p build
+          rojo build default.project.json --output build/BravoSix-src.rbxl
+          test -s build/BravoSix-src.rbxl
+
+      - name: Merge code into original map without overwriting instances
+        run: |
+          lune run scripts/merge-place.luau
+          test -s BravoSix-merged.rbxl
+
+      - name: Upload merged place backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: BravoSix-merged-place
+          path: BravoSix-merged.rbxl
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Validate publishing secrets
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ secrets.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_PLACE_ID: ${{ secrets.ROBLOX_PLACE_ID }}
+        shell: bash
+        run: |
+          if [ -z "$ROBLOX_API_KEY" ] || [ -z "$ROBLOX_UNIVERSE_ID" ] || [ -z "$ROBLOX_PLACE_ID" ]; then
+            echo "::error::Missing ROBLOX_API_KEY, ROBLOX_UNIVERSE_ID, or ROBLOX_PLACE_ID repository secret. Build artifact is available; publishing was skipped."
+            exit 1
+          fi
+
+      - name: Publish through Roblox Open Cloud
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ secrets.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_PLACE_ID: ${{ secrets.ROBLOX_PLACE_ID }}
+          VERSION_TYPE: ${{ inputs.version_type }}
+        run: node scripts/publish-place.mjs
