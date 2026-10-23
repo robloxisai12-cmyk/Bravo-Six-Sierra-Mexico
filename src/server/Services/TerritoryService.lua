@@ -31,7 +31,9 @@ end
 local function isPlayerInside(player, zone)
     local character = player.Character
     local root = character and character:FindFirstChild("HumanoidRootPart")
-    if not root then
+    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+    -- Solo cuentan jugadores vivos (un cuerpo muerto no debe mantener ni capturar la zona).
+    if not root or not humanoid or humanoid.Health <= 0 then
         return false
     end
 
