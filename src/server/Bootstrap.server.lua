@@ -171,8 +171,7 @@ local function watchPlayer(player)
         -- Re-assert the chosen Bravo Six faction after template CharacterAdded handlers run.
         task.defer(function()
             if player.Parent and player.Team then
-                local teamName = player.Team.Name
-                if teamName == "Government" or teamName == "Cartels" then
+                if player.Team == teamObjects.Government or player.Team == teamObjects.Cartels then
                     player.Neutral = false
                 end
             end
