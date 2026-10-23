@@ -72,4 +72,4 @@ assert(mergedBytes ~= nil and #mergedBytes > 0, "Serialization produced an empty
 fs.writeFile(OUTPUT_PATH, mergedBytes)
 
 print("Merge complete. Original map was not modified.")
-print("Output: " .. OUTPUT_PATH .. " (" .. tostring(buffer.len(mergedBytes)) .. " bytes)")
+print("Output: " .. OUTPUT_PATH .. " (" .. tostring(#mergedBytes) .. " bytes)")
