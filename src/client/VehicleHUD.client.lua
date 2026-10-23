@@ -78,21 +78,21 @@ local function addButton(name, label, vehicleType, y, color)
 end
 
 local government = player.Team and player.Team.Name == VehicleConfig.Teams.Government
-local sierra = player.Team and player.Team.Name == VehicleConfig.Teams.Sierra
+local cartels = player.Team and player.Team.Name == VehicleConfig.Teams.Cartels
 local federalButton = addButton("FederalPickup", "Camioneta táctica federal", "GovernmentTactical", 65, Color3.fromRGB(42, 91, 69))
-local sierraButton = addButton("SierraPickup", "Camioneta Sierra", "CartelPickup", 105, Color3.fromRGB(91, 75, 60))
+local sierraButton = addButton("SierraPickup", "Camioneta de cártel", "CartelPickup", 105, Color3.fromRGB(91, 75, 60))
 local truckButton = addButton("LogisticsTruck", "Camión logístico (Federal)", "LogisticsTruck", 145, Color3.fromRGB(70, 83, 68))
 local boatButton = addButton("PatrolBoat", "Lancha de patrulla (Federal)", "PatrolBoat", 185, Color3.fromRGB(35, 78, 100))
 
 local function updateTeamVisibility()
     local team = player.Team
     local isGovernment = team and team.Name == VehicleConfig.Teams.Government
-    local isSierra = team and team.Name == VehicleConfig.Teams.Sierra
+    local isCartels = team and team.Name == VehicleConfig.Teams.Cartels
     federalButton.Visible = isGovernment
     truckButton.Visible = isGovernment
     boatButton.Visible = isGovernment
-    sierraButton.Visible = isSierra
-    if not isGovernment and not isSierra then
+    sierraButton.Visible = isCartels
+    if not isGovernment and not isCartels then
         status.Text = "Elige un equipo para solicitar vehículos."
     end
 end
