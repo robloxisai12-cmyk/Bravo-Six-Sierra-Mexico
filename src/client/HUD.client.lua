@@ -6,7 +6,6 @@ local player = Players.LocalPlayer
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 local remotes = ReplicatedStorage:WaitForChild(Config.RemotesFolderName)
 local territoryRemote = remotes:WaitForChild(Config.TerritoryUpdateRemoteName)
-local teamRequestRemote = remotes:WaitForChild(Config.TeamRequestRemoteName)
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "BravoSixHUD"
@@ -88,55 +87,7 @@ local function fitForScreen()
     end
 end
 
-local teamPanel = Instance.new("Frame")
-teamPanel.Name = "TeamSelector"
-teamPanel.AnchorPoint = Vector2.new(0, 1)
-teamPanel.Position = UDim2.new(0, 12, 1, -12)
-teamPanel.Size = UDim2.new(0, 236, 0, 94)
-teamPanel.BackgroundColor3 = Color3.fromRGB(18, 24, 32)
-teamPanel.BackgroundTransparency = 0.12
-teamPanel.BorderSizePixel = 0
-teamPanel.Parent = gui
-
-local teamPanelCorner = Instance.new("UICorner")
-teamPanelCorner.CornerRadius = UDim.new(0, 10)
-teamPanelCorner.Parent = teamPanel
-
-local teamTitle = Instance.new("TextLabel")
-teamTitle.BackgroundTransparency = 1
-teamTitle.Position = UDim2.fromOffset(10, 5)
-teamTitle.Size = UDim2.new(1, -20, 0, 22)
-teamTitle.Font = Enum.Font.GothamBold
-teamTitle.Text = "SELECCIONA TU FUERZA"
-teamTitle.TextColor3 = Color3.fromRGB(240, 244, 248)
-teamTitle.TextSize = 12
-teamTitle.TextXAlignment = Enum.TextXAlignment.Left
-teamTitle.Parent = teamPanel
-
-local function makeTeamButton(text, color, position, teamKey)
-    local button = Instance.new("TextButton")
-    button.Name = teamKey .. "Button"
-    button.Position = position
-    button.Size = UDim2.new(0.5, -14, 0, 48)
-    button.BackgroundColor3 = color
-    button.BorderSizePixel = 0
-    button.AutoButtonColor = true
-    button.Font = Enum.Font.GothamBold
-    button.Text = text
-    button.TextColor3 = Color3.new(1, 1, 1)
-    button.TextSize = 12
-    button.TextWrapped = true
-    button.Parent = teamPanel
-    local buttonCorner = Instance.new("UICorner")
-    buttonCorner.CornerRadius = UDim.new(0, 7)
-    buttonCorner.Parent = button
-    button.Activated:Connect(function()
-        teamRequestRemote:FireServer(teamKey)
-    end)
-end
-
-makeTeamButton("FUERZA FEDERAL", Color3.fromRGB(38, 105, 185), UDim2.fromOffset(8, 34), "Government")
-makeTeamButton("FUERZA SIERRA", Color3.fromRGB(177, 48, 48), UDim2.new(0.5, 6, 0, 34), "Sierra")
+-- La selección de bando/unidad ahora vive en DeployMenu.client.lua
 
 gui.Parent = player:WaitForChild("PlayerGui")
 fitForScreen()
@@ -156,10 +107,10 @@ territoryRemote.OnClientEvent:Connect(function(state)
         status.Text = string.format("%s: %s", state.territory, owner)
     end
     barFill.Size = UDim2.fromScale(math.clamp(tonumber(state.progress) or 0, 0, 1), 1)
-    if progressTeam == Config.Teams.Sierra.Name then
+    if progressTeam == Config.Teams.Cartels.Name then
         barFill.BackgroundColor3 = Color3.fromRGB(230, 73, 73)
     else
-        barFill.BackgroundColor3 = Color3.fromRGB(61, 155, 255)
+        barFill.BackgroundColor3 = Color3.fromRGB(61, 155, 120)
     end
 end)
 

@@ -4,7 +4,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
-local ServerStorage = game:GetService("ServerStorage")
 
 local VehicleConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("VehicleConfig"))
 
@@ -267,15 +266,58 @@ local function getSpawnCFrame(player, definition)
 
     local character = player.Character
     local root = character and character:FindFirstChild("HumanoidRootPart")
+    if not root then
+        return nil
+    end
+
+    local chosen = nil
+    local desiredCFrame
     if #candidates > 0 then
-        local chosen = candidates[math.random(1, #candidates)]
-        return chosen.CFrame + definition.SpawnOffset
-    end
-    if root then
+        chosen = candidates[math.random(1, #candidates)]
+        desiredCFrame = chosen.CFrame
+    else
         local position = root.Position + root.CFrame.LookVector * VehicleConfig.FallbackSpawnDistance
-        return CFrame.lookAt(position + definition.SpawnOffset, position + root.CFrame.LookVector * 10)
+        desiredCFrame = CFrame.lookAt(position, position + root.CFrame.LookVector)
     end
-    return CFrame.new(0, 8, 0)
+
+    local rayParams = RaycastParams.new()
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+    rayParams.FilterDescendantsInstances = { character, chosen }
+    rayParams.IgnoreWater = false
+    local hit = Workspace:Raycast(desiredCFrame.Position + Vector3.new(0, 100, 0), Vector3.new(0, -300, 0), rayParams)
+    if not hit then
+        return nil
+    end
+
+    local isTruck = definition.Kind == "Truck"
+    local isBoat = definition.Kind == "Boat"
+    local length = isTruck and 12 or (isBoat and 11 or 8)
+    local width = isTruck and 5 or 4
+    local chassisHeight = isBoat and 1.2 or 1.5
+    local center = Vector3.new(desiredCFrame.Position.X, hit.Position.Y + chassisHeight * 0.5 + 0.35, desiredCFrame.Position.Z)
+    local flatLook = Vector3.new(desiredCFrame.LookVector.X, 0, desiredCFrame.LookVector.Z)
+    if flatLook.Magnitude < 0.01 then
+        flatLook = Vector3.new(0, 0, -1)
+    end
+    local finalCFrame = CFrame.lookAt(center, center + flatLook.Unit)
+
+    local overlapParams = OverlapParams.new()
+    overlapParams.FilterType = Enum.RaycastFilterType.Exclude
+    local excluded = { character, hit.Instance }
+    if chosen then
+        table.insert(excluded, chosen)
+    end
+    overlapParams.FilterDescendantsInstances = excluded
+    overlapParams.MaxParts = 30
+    local bounds = Vector3.new(width + 1.5, chassisHeight + 3.5, length + 1.5)
+    for _, part in ipairs(Workspace:GetPartBoundsInBox(finalCFrame, bounds, overlapParams)) do
+        if part.CanCollide then
+            return nil
+        end
+    end
+
+    -- La flotabilidad de la lancha sigue pendiente de una prueba real en Roblox.
+    return finalCFrame
 end
 
 local function removeRecord(record)
@@ -300,6 +342,14 @@ local function requestSpawn(player, vehicleType)
         return
     end
 
+    local character = player.Character
+    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+    local root = character and character:FindFirstChild("HumanoidRootPart")
+    if not humanoid or humanoid.Health <= 0 or not root then
+        sendState(player, "Debes estar vivo para solicitar un vehículo.")
+        return
+    end
+
     local now = os.clock()
     if lastRequestAt[player] and now - lastRequestAt[player] < VehicleConfig.RequestCooldown then
         sendState(player, "Espera unos segundos antes de solicitar otro vehículo.")
@@ -307,10 +357,21 @@ local function requestSpawn(player, vehicleType)
     end
     lastRequestAt[player] = now
 
-    if now < (nextSpawnAt[player] or 0) then
+    if now < (nextSpawnAt[player.UserId] or 0) then
         sendState(player, "El punto de vehículos se está rearmando. Inténtalo más tarde.")
         return
     end
+    local ownedCount = 0
+    for _, active in ipairs(activeVehicles) do
+        if active.ownerUserId == player.UserId and active.model and active.model.Parent then
+            ownedCount += 1
+        end
+    end
+    if ownedCount >= VehicleConfig.MaxActivePerPlayer then
+        sendState(player, "Ya tienes un vehículo activo. Espera a que se retire antes de pedir otro.")
+        return
+    end
+
     if #activeVehicles >= VehicleConfig.MaxActiveVehicles then
         sendState(player, "Servidor lleno de vehículos (" .. tostring(VehicleConfig.MaxActiveVehicles) .. " máximo).")
         return
@@ -318,6 +379,10 @@ local function requestSpawn(player, vehicleType)
 
     local definition = VehicleConfig.Types[vehicleType]
     local spawnCFrame = getSpawnCFrame(player, definition)
+    if not spawnCFrame then
+        sendState(player, "No se encontró una superficie libre para colocar el vehículo.")
+        return
+    end
     local record = buildVehicle(vehicleType, spawnCFrame)
     if not record then
         sendState(player, "No se pudo crear el vehículo.")
@@ -413,7 +478,7 @@ function VehicleService.Start()
 
     Players.PlayerRemoving:Connect(function(player)
         lastRequestAt[player] = nil
-        nextSpawnAt[player] = nil
+        nextSpawnAt[player.UserId] = nil
     end)
 
     print("[Bravo Six] VehicleService started.")
