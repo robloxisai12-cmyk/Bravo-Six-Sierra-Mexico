@@ -37,8 +37,8 @@ jobs:
       - name: Build Bravo Six scripts with Rojo
         run: |
           mkdir -p build
-          rojo build default.project.json --output build/BravoSix-src.rbxlx
-          test -s build/BravoSix-src.rbxlx
+          rojo build default.project.json --output build/BravoSix-src.rbxl
+          test -s build/BravoSix-src.rbxl
 
       - name: Merge code into original map without overwriting instances
         run: |
