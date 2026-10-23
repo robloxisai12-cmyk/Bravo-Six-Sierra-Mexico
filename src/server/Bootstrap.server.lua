@@ -3,6 +3,7 @@ local Teams = game:GetService("Teams")
 
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 local TerritoryService = require(script.Parent:WaitForChild("Services"):WaitForChild("TerritoryService"))
+local VehicleService = require(script.Parent:WaitForChild("Services"):WaitForChild("VehicleService"))
 
 local function getOrCreateTeam(config)
     local team = Teams:FindFirstChild(config.Name)
@@ -72,4 +73,5 @@ game:GetService("Players").PlayerRemoving:Connect(function(player)
 end)
 
 TerritoryService.Start()
+VehicleService.Start()
 print("[Bravo Six] Server systems initialized.")
