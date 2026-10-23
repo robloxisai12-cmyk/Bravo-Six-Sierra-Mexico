@@ -167,6 +167,17 @@ end)
 
 local function watchPlayer(player)
     player.CharacterAdded:Connect(function(character)
+        -- The map template's MapAccessService marks characters Neutral on spawn.
+        -- Re-assert the chosen Bravo Six faction after template CharacterAdded handlers run.
+        task.defer(function()
+            if player.Parent and player.Team then
+                local teamName = player.Team.Name
+                if teamName == "Government" or teamName == "Cartels" then
+                    player.Neutral = false
+                end
+            end
+        end)
+
         local humanoid = character:WaitForChild("Humanoid", 10)
         if not humanoid then
             return
