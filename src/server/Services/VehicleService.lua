@@ -109,7 +109,7 @@ local function buildVehicle(vehicleType, spawnCFrame)
     model:SetAttribute("VehicleType", vehicleType)
     model:SetAttribute("TeamKey", definition.TeamKey)
     model:SetAttribute("DriverUserId", 0)
-    model:SetAttribute("EmptySince", 0)
+    model:SetAttribute("EmptySince", os.clock())
 
     local isTruck = definition.Kind == "Truck"
     local isBoat = definition.Kind == "Boat"
